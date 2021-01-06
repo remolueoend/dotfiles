@@ -33,13 +33,13 @@ pub fn get_config_file_path(global_args: &GlobalArgs) -> Result<PathBuf, AppErro
 /// Describes the status of a link configured in mappings
 pub enum LinkStatus {
     /// file does not exist in the dotfiles repository
-    Missing,
+    Invalid(PathBuf),
     /// symlink found and pointing to correct target in dotfiles repository
     Linked,
     /// file is currently not linked
     Unlinked,
     /// symlink found but pointing to another target
-    ConfictWrongTarget(PathBuf),
+    ConflictWrongTarget(PathBuf),
     /// file/directory found, but not a symlink
     ConflictNoLink(PathBuf),
 }
@@ -53,7 +53,7 @@ pub fn get_file_status(global_args: &GlobalArgs, link: &Link) -> Result<LinkStat
     let expected_target = global_args.dotfiles_root.join(link);
 
     if expected_target.exists() == false {
-        return Ok(LinkStatus::Missing);
+        return Ok(LinkStatus::Invalid(expected_target));
     }
 
     if actual_file_path.exists() == false {
@@ -81,7 +81,7 @@ pub fn get_file_status(global_args: &GlobalArgs, link: &Link) -> Result<LinkStat
     })?;
 
     if actual_target != expected_target {
-        Ok(LinkStatus::ConfictWrongTarget(actual_target))
+        Ok(LinkStatus::ConflictWrongTarget(actual_target))
     } else {
         Ok(LinkStatus::Linked)
     }

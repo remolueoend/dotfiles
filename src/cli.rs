@@ -1,11 +1,8 @@
+use crate::{commands::status, AppError};
+use clap::{App, AppSettings, Arg, ArgMatches};
 use std::path::PathBuf;
 
-use clap::{App, Arg, ArgMatches, SubCommand};
-
-use crate::AppError;
-
 const ARG_DOTFILES_ROOT: &str = "dotfiles-root";
-pub const CMD_STATUS: &str = "status";
 
 /// returns a new clap APP CLI interface used for this app
 pub fn build_cli<'a, 'b>() -> App<'a, 'b> {
@@ -13,6 +10,7 @@ pub fn build_cli<'a, 'b>() -> App<'a, 'b> {
         .version("0.1")
         .author("remolueoend")
         .about("Simple dotfiles manager keeping track of file links")
+        .setting(AppSettings::ColoredHelp)
         .arg(
             Arg::with_name(ARG_DOTFILES_ROOT)
                 .short("r")
@@ -21,9 +19,7 @@ pub fn build_cli<'a, 'b>() -> App<'a, 'b> {
                 .help("the absolute path of the dotfiles repository root directory")
                 .env("DOTFILES_ROOT"),
         )
-        .subcommand(
-            SubCommand::with_name(CMD_STATUS).about("shows the current status of all dotfiles"),
-        )
+        .subcommand(status::get_subcommand())
 }
 
 /// Contains all global cli options which are independent of the chosen sub-command

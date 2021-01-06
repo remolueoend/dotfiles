@@ -2,7 +2,7 @@
 
 **⚠ This project is under development and not yet ready for use in production ⚠**
 
-This app provides a simple dotfiles manager. It only manages the linking of configuration files from your dotfiles directory into your home directory. It leaves it up to you how you want to store and version you dotfiles, be it a GIT repository or a Google-Drive folder.
+This app provides a simple dotfiles manager. It only manages the linking of configuration files from your dotfiles directory into your home directory. It leaves it up to you how you want to store and version your dotfiles, be it a GIT repository or a Google-Drive folder.
 
 There are many dotfiles managers out there and even more contradicting philosophies how dotfiles should be managed in general. This project sticks to the following ideas, but keep in mind: There is no right or wrong, these ideas are fully subjective to the author of this tool:
 1. Dotfiles are kept in a separate directory. The user home directory should not be a GIT repository root.
