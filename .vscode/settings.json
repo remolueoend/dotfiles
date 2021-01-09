@@ -1,11 +1,15 @@
 {
     "cSpell.enabled": true,
     "cSpell.words": [
+        "Deque",
+        "dotfile",
         "dotfiles",
         "entrypoint",
         "remolueoend",
         "subcommand",
         "symlink",
-        "toolchain"
+        "symlinks",
+        "toolchain",
+        "walkdir"
     ]
 }

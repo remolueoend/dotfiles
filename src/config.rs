@@ -36,7 +36,7 @@ pub type Link = PathBuf;
 /// Describes the parsed configuration from the dotfiles configuration file.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppConfig {
-    config_version: i8, // we can increase it at anytime when necessary..
+    pub config_version: i8, // we can increase it at anytime when necessary..
     #[serde(deserialize_with = "into_normalized_mapping")]
     pub mappings: Vec<Link>,
 }

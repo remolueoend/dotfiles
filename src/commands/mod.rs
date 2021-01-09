@@ -1,6 +1,11 @@
-use clap::ArgMatches;
-
+/// This module folder contains a sub-module for each sub-command callable via CLI.
+/// Each command-module should provide the following objects:
+/// 1. A clap sub-command definition in form of a `clap::App` instance which is used by the cli-module to register the command.
+/// 2. The name of the command (eg. `CMD_IDENTIFIER`) which is used to register the command and match on the CLI arguments.
+/// 3. Some kind of `run` function which accepts the sub-command arguments and global arguments passed via CLI
+///    and executes the program of the command.
 use crate::{cli::GlobalArgs, AppError};
+use clap::ArgMatches;
 
 pub mod status;
 

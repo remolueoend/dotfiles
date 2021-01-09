@@ -33,6 +33,12 @@ impl<'a> GlobalArgs {
         let dotfiles_root = arg_matches.value_of(ARG_DOTFILES_ROOT).unwrap();
 
         let dotfiles_root_path = PathBuf::from(dotfiles_root);
+        if !dotfiles_root_path.is_absolute() {
+            return Err(AppError::CliInvalidArgValue(
+                String::from(ARG_DOTFILES_ROOT),
+                format!("The path to your dotfiles directory provided via -r or environment variable must be absolute. Provided value: {}", dotfiles_root),
+            ));
+        }
         if !dotfiles_root_path.is_dir() {
             return Err(AppError::CliInvalidArgValue(
                 String::from(ARG_DOTFILES_ROOT),
