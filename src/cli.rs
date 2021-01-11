@@ -1,4 +1,7 @@
-use crate::{commands::status, AppError};
+use crate::{
+    commands::{add, status},
+    AppError,
+};
 use clap::{App, AppSettings, Arg, ArgMatches};
 use std::path::PathBuf;
 
@@ -11,6 +14,7 @@ pub fn build_cli<'a, 'b>() -> App<'a, 'b> {
         .author("remolueoend")
         .about("Simple dotfiles manager keeping track of file links")
         .setting(AppSettings::ColoredHelp)
+        .setting(AppSettings::ArgRequiredElseHelp)
         .arg(
             Arg::with_name(ARG_DOTFILES_ROOT)
                 .short("r")
@@ -20,6 +24,7 @@ pub fn build_cli<'a, 'b>() -> App<'a, 'b> {
                 .env("DOTFILES_ROOT"),
         )
         .subcommand(status::get_subcommand())
+        .subcommand(add::get_subcommand())
 }
 
 /// Contains all global cli options which are independent of the chosen sub-command

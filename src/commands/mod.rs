@@ -7,6 +7,7 @@
 use crate::{cli::GlobalArgs, AppError};
 use clap::ArgMatches;
 
+pub mod add;
 pub mod status;
 
 pub type CommandResult = Result<(), AppError>;
@@ -17,6 +18,7 @@ pub fn run_command(cli_args: &ArgMatches) -> CommandResult {
 
     match cli_args.subcommand() {
         (status::CMD_IDENTIFIER, Some(cmd_args)) => status::run(cmd_args, &global_args),
+        (add::CMD_IDENTIFIER, Some(cmd_args)) => add::run(cmd_args, &global_args),
         ("", _) => Err(AppError::CliMissingCommand),
         // should never be called thanks to `clap`s own validation:
         (cmd, _) => Err(AppError::CliInvalidCommand(cmd.to_string())),

@@ -1,3 +1,4 @@
+use crate::commands;
 use std::{
     fmt::{Debug, Display},
     path::{PathBuf, StripPrefixError},
@@ -41,6 +42,9 @@ pub enum AppError {
     FsResolveConfig(StripPrefixError),
     /// An unspecified file system related error. Consists of a custom error message.
     FsOther(String),
+    /// An error specific to the `add` sub-command occurred.
+    /// Consists of the error itself.
+    CmdAddError(commands::add::Error),
 }
 
 impl Display for AppError {
@@ -92,6 +96,9 @@ impl Display for AppError {
             }
             AppError::FsOther(message) => {
                 write!(f, "A file system error occurred: {}", message)
+            }
+            AppError::CmdAddError(err) => {
+                write!(f, "{}", err)
             }
         }
     }

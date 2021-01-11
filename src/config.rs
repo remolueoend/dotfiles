@@ -29,16 +29,16 @@ where
     Ok(output)
 }
 
-/// Describes a file which should be linked based on the dotfiles config
-/// Variables of this type contain a relative path, such as `.config/some/conf`
-pub type Link = PathBuf;
+/// Describes a mapped path listed in the dotfiles configuration under `mappings`.
+/// Variables of this type contain a relative path, such as `.config/some/conf`.
+pub type Mapping = PathBuf;
 
 /// Describes the parsed configuration from the dotfiles configuration file.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppConfig {
     pub config_version: i8, // we can increase it at anytime when necessary..
     #[serde(deserialize_with = "into_normalized_mapping")]
-    pub mappings: Vec<Link>,
+    pub mappings: Vec<Mapping>,
 }
 
 impl AppConfig {
@@ -75,6 +75,11 @@ impl AppConfig {
         config.validate_nested_mappings()?;
 
         Ok(config)
+    }
+
+    /// adds a path to the mappings.
+    pub fn add_mapping(&mut self, mapping: PathBuf) -> () {
+        self.mappings.push(mapping);
     }
 
     /// Writes this configuration to the dotfiles configuration file by either overwriting the current content

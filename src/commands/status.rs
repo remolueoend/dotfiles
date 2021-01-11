@@ -14,7 +14,7 @@ INVALID : This path is listed in the configuration, but does not exist in the do
 CONFLICT: The path exists in the home directory, but is either not a symlink
           or does not point to its counterpart in the dotfiles directory.
 UNLINKED: The file is currently not linked to the home directory.
-MISSING : This file or directory in the dotfiles repository is nowhere mentioned under mappings
+UNMAPPED: This file or directory in the dotfiles repository is nowhere mentioned under mappings
           and will therefore never be linked.
 "#;
 
@@ -36,10 +36,6 @@ pub fn run(args: &ArgMatches, global_args: &GlobalArgs) -> CommandResult {
     let _args = StatusCommandArgs::from_args(args);
     let config = AppConfig::from_config_file(global_args)?;
 
-    if config.mappings.len() == 0 {
-        println!("There are no links configured")
-    }
-
     let dotfile_entries = get_dotfiles_entries(global_args, &config).map_err(|err| {
         AppError::FsOther(format!(
             "Failed to read your dotfile directory at {}: {}",
@@ -49,22 +45,22 @@ pub fn run(args: &ArgMatches, global_args: &GlobalArgs) -> CommandResult {
     })?;
     for entry in &dotfile_entries {
         let status =
-            get_dotfiles_entry_status(global_args, entry, &get_home_dir()?).map_err(|err| {
+            get_dotfiles_entry_state(global_args, entry, &get_home_dir()?).map_err(|err| {
                 AppError::FsOther(format!("Failed to read your linked dotfiles: {}", err))
             })?;
         let text_status = match status {
-            LinkStatus::Unlinked => "UNLINKED".yellow(),
-            LinkStatus::Linked => "LINKED  ".green(),
-            LinkStatus::Invalid(_) => "INVALID ".purple(),
-            LinkStatus::ConflictNoLink(_) => "CONFLICT".red(),
-            LinkStatus::ConflictWrongTarget(_) => "CONFLICT".red(),
-            LinkStatus::Unmapped => "UNMAPPED".white(),
+            LinkState::Unlinked => "UNLINKED".yellow(),
+            LinkState::Linked => "LINKED  ".green(),
+            LinkState::Invalid(_) => "INVALID ".purple(),
+            LinkState::ConflictNoLink(_) => "CONFLICT".red(),
+            LinkState::ConflictWrongTarget(_) => "CONFLICT".red(),
+            LinkState::Unmapped => "UNMAPPED".white(),
         };
 
         let description = match status {
-            LinkStatus::ConflictNoLink(target) => format!("{:?} is not a symlink", target),
-            LinkStatus::ConflictWrongTarget(target) => format!("points to {:?} instead", target),
-            LinkStatus::Invalid(target) => format!("{:?} does not exist", target),
+            LinkState::ConflictNoLink(target) => format!("{:?} is not a symlink", target),
+            LinkState::ConflictWrongTarget(target) => format!("points to {:?} instead", target),
+            LinkState::Invalid(target) => format!("{:?} does not exist", target),
             _ => String::new(),
         };
 
@@ -135,7 +131,7 @@ fn get_dotfiles_entries(
 }
 
 /// Describes the status of a link configured in mappings
-pub enum LinkStatus {
+pub enum LinkState {
     /// file does not exist in the dotfiles repository
     Invalid(PathBuf),
     /// symlink found and pointing to correct target in dotfiles repository
@@ -151,11 +147,11 @@ pub enum LinkStatus {
 }
 
 /// Returns the status for a given dotfiles entry.
-pub fn get_dotfiles_entry_status(
+pub fn get_dotfiles_entry_state(
     global_args: &GlobalArgs,
     entry: &DotfilesEntry,
     target_dir: &PathBuf,
-) -> io::Result<LinkStatus> {
+) -> io::Result<LinkState> {
     let (path, state) = entry;
 
     // path to the symlink at the target location
@@ -165,25 +161,25 @@ pub fn get_dotfiles_entry_status(
 
     // invalid and unmapped entries can be translated directly:
     match state {
-        DotfilesEntryState::Invalid => return Ok(LinkStatus::Invalid(expected_target)),
-        DotfilesEntryState::Unmapped => return Ok(LinkStatus::Unmapped),
+        DotfilesEntryState::Invalid => return Ok(LinkState::Invalid(expected_target)),
+        DotfilesEntryState::Unmapped => return Ok(LinkState::Unmapped),
         _ => (),
     };
 
     // the entry in the dotfiles exists, but the corresponding file in the home directory does not:
     if actual_file_path.exists() == false {
-        return Ok(LinkStatus::Unlinked);
+        return Ok(LinkState::Unlinked);
     };
 
     let actual_file_meta = actual_file_path.symlink_metadata()?;
     if actual_file_meta.file_type().is_symlink() == false {
-        return Ok(LinkStatus::ConflictNoLink(actual_file_path));
+        return Ok(LinkState::ConflictNoLink(actual_file_path));
     };
 
     let actual_target = fs::read_link(&actual_file_path)?;
     if actual_target != expected_target {
-        Ok(LinkStatus::ConflictWrongTarget(actual_target))
+        Ok(LinkState::ConflictWrongTarget(actual_target))
     } else {
-        Ok(LinkStatus::Linked)
+        Ok(LinkState::Linked)
     }
 }
