@@ -2,7 +2,7 @@ use super::CommandResult;
 use crate::{cli::GlobalArgs, config, errors::AppError, files::get_home_dir};
 use clap::{App, ArgMatches, SubCommand};
 use colored::*;
-use config::AppConfig;
+use config::{AppConfig, Mapping};
 use std::{collections::VecDeque, fs, io, iter::FromIterator, path::PathBuf};
 
 pub const CMD_IDENTIFIER: &str = "status";
@@ -73,6 +73,33 @@ pub fn run(args: &ArgMatches, global_args: &GlobalArgs) -> CommandResult {
     }
 
     Ok(())
+}
+
+pub enum MappingSourceStatus {
+    Existing,
+    Missing,
+}
+pub enum MappingTargetStatus<'a> {
+    Linked(&'a PathBuf),
+    Missing,
+    WrongLink(&'a PathBuf),
+    Conflict,
+}
+
+pub struct MappingStatus<'a> {
+    pub path: &'a PathBuf,
+    pub src_state: MappingSourceStatus,
+    pub target_state: MappingTargetStatus<'a>,
+}
+
+impl<'a> MappingStatus<'a> {
+    pub fn from_mapping(mapping: &'a Mapping) -> Result<MappingStatus<'a>, AppError> {
+        Ok(MappingStatus {
+            path: mapping,
+            src_state: MappingSourceStatus::Existing,
+            target_state: MappingTargetStatus::Missing,
+        })
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
