@@ -11,7 +11,7 @@ use std::{
 /// `./.config => .config`.
 /// This is important for comparing paths with each other, because the default compare implementation
 /// of PathBuf returns `false` for `Path::from("./.config") == Path::from(".config")`.
-fn into_normalized_mapping<'de, D>(deserializer: D) -> Result<Vec<PathBuf>, D::Error>
+fn into_normalized_mapping<'de, D>(deserializer: D) -> Result<Vec<Mapping>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -31,7 +31,11 @@ where
 
 /// Describes a mapped path listed in the dotfiles configuration under `mappings`.
 /// Variables of this type contain a relative path, such as `.config/some/conf`.
-pub type Mapping = PathBuf;
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Mapping {
+    from: PathBuf,
+    to: PathBuf,
+}
 
 /// Describes the parsed configuration from the dotfiles configuration file.
 #[derive(Serialize, Deserialize, Debug)]

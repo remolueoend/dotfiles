@@ -2,4 +2,5 @@ config_version = "1"
 
 mappings = [
   ".config/some-file.txt",
+  [".config/some-file.txt", "/foobar"],
 ]

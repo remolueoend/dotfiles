@@ -14,6 +14,7 @@ promptly = "^0.3"
 serde = {version = "^1", features = ["derive"]}
 toml = "^0.5"
 walkdir = "^2"
+petgraph = "0.6.0"
 
 [dependencies.clap]
 features = ["color", "wrap_help"]

@@ -45,6 +45,7 @@ pub enum AppError {
     /// An error specific to the `add` sub-command occurred.
     /// Consists of the error itself.
     CmdAddError(commands::add::Error),
+    NotImplemented,
 }
 
 impl Display for AppError {
@@ -99,6 +100,9 @@ impl Display for AppError {
             }
             AppError::CmdAddError(err) => {
                 write!(f, "{}", err)
+            }
+            AppError::NotImplemented => {
+                write!(f, "Not implemented")
             }
         }
     }
